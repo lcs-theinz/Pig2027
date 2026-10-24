@@ -20,7 +20,8 @@ import SwiftUI
 // TRY: Change these two colours. Try Color.purple, Color.green or Color.pink.
 let playerOneColor: Color = Color.blue
 let playerTwoColor: Color = Color.orange
-
+// The first player to reach this score wins.
+let winningScore: Int = 100
 // The game itself: what it remembers, what it shows on the screen,
 // and what it does when you click a button.
 struct PigView: View {
@@ -49,6 +50,9 @@ struct PigView: View {
 
     // A message that tells the players what just happened.
     @State var message: String = "Player 1 goes first. Click Roll to start."
+    @State var gameIsOver: Bool = false
+    
+    @State var diceRotation: Double =  0
 
     // MARK: - Computed properties
 
@@ -56,12 +60,23 @@ struct PigView: View {
         VStack(spacing: 12) {
 
             // The title at the top of the screen.
-            HStack {
+            VStack {
+
                 Image(systemName: "dice.fill")
+                    .font(.system(size: 50))
+
                 Text("Pig")
+                    .font(.system(size: 42,
+                                  weight: .heavy))
+
             }
-            .font(.largeTitle)
-            .bold()
+            .foregroundStyle(
+                LinearGradient(
+                    colors: [.blue, .purple],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
 
             // The scoreboard: one card for each player.
             HStack(spacing: 16) {
@@ -74,9 +89,17 @@ struct PigView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(playerOneColor.opacity(0.2))
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-
+                .background(
+                    currentPlayer == 1
+                    ? playerOneColor.opacity(0.45)
+                    : playerOneColor.opacity(0.15)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .shadow(
+                    color: .black.opacity(0.1),
+                    radius: 8
+                )
+                
                 VStack {
                     Text("Player 2")
                         .font(.headline)
@@ -86,9 +109,18 @@ struct PigView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(playerTwoColor.opacity(0.2))
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-            }
+                .background(
+
+                    currentPlayer == 2
+                    ? playerTwoColor.opacity(0.45)
+                    : playerTwoColor.opacity(0.15)
+
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .shadow(
+                    color: .black.opacity(0.1),
+                    radius: 8
+                )            }
 
             Spacer()
 
@@ -103,6 +135,7 @@ struct PigView: View {
             Image(systemName: dieSymbol)
                 .font(.system(size: 120))
                 .foregroundStyle(turnColor)
+                .rotationEffect(.degrees(diceRotation))
 
             Text("Turn total: \(turnTotal)")
                 .font(.title2)
@@ -120,10 +153,11 @@ struct PigView: View {
             // The two buttons a player uses on their turn.
             // The code inside the braces runs when that button is clicked.
             HStack(spacing: 16) {
-                Button("Roll", systemImage: "dice") {
+                Button("Roll", systemImage: "hand.raised.fill") {
                     rollDie()
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(gameIsOver)
 
                 Button("Hold", systemImage: "hand.raised.fill") {
                     hold()
@@ -138,7 +172,42 @@ struct PigView: View {
             Button("New Game") {
                 startNewGame()
             }
+            if gameIsOver {
+                VStack (spacing: 20) {
+                    
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 80))
+                        .foregroundStyle(.yellow)
+                    
+                    Text("Player \(currentPlayer) Wins!")
+                        .font(.largeTitle)
+                        .bold()
+                    
+                    Button("Play Again") {
+                        startNewGame()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding(40)
+                .backgroundStyle(.regularMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 30))
+            }
         }
+        .background(
+
+            LinearGradient(
+
+                colors: [
+                    Color.purple.opacity(0.15),
+                    Color.blue.opacity(0.15)
+                ],
+
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+
+            )
+
+        )
         .padding(32)
         .fontDesign(.rounded)
         // How big the game's window is on the Mac. It can be made taller or wider.
@@ -146,12 +215,21 @@ struct PigView: View {
     }
 
     // MARK: - Functions
-
+    // Picks a random whole number from 1 to 6, just like a real die.
+    func rollOneDie() -> Int {
+        let roll: Int = Int.random(in: 1...6)
+        return roll
+    }
+     
+    // Answers true when a score is high enough to win.
+    func hasWon(score: Int) -> Bool {
+        return score >= winningScore
+    }
     // Rolls the die once for the current player.
     func rollDie() {
 
         // Pick a random whole number from 1 to 6, just like a real die.
-        let roll: Int = Int.random(in: 1...6)
+        let roll: Int = rollOneDie()
 
         // Show the matching die face. For a roll of 4, the symbol is "die.face.4.fill".
         dieSymbol = "die.face.\(roll).fill"
@@ -167,6 +245,9 @@ struct PigView: View {
             // TRY: Change this message.
             message = "You rolled a \(roll). Roll again, or hold?"
         }
+        withAnimation(.easeInOut(duration: 0.4)){
+            diceRotation += 360
+        }
     }
 
     // Banks the turn total into the current player's score, then ends the turn.
@@ -176,9 +257,20 @@ struct PigView: View {
         } else {
             playerTwoScore += turnTotal
         }
-        message = "Player \(currentPlayer) banked \(turnTotal) points."
-        turnTotal = 0
-        switchPlayer()
+     
+        // Has either player reached the winning score?
+        let someoneHasWon: Bool = playerOneScore >= winningScore || playerTwoScore >= winningScore
+     
+        if someoneHasWon {
+            message = "Player \(currentPlayer) wins! Click New Game to play again."
+            dieSymbol = "trophy.fill"
+            turnTotal = 0
+            gameIsOver = true
+        } else {
+            message = "Player \(currentPlayer) banked \(turnTotal) points."
+            turnTotal = 0
+            switchPlayer()
+        }
     }
 
     // Passes the turn to the other player.
@@ -201,6 +293,8 @@ struct PigView: View {
         turnColor = playerOneColor
         dieSymbol = "questionmark.square.fill"
         message = "Player 1 goes first. Click Roll to start."
+        gameIsOver = false
+        diceRotation = 0
     }
 }
 
