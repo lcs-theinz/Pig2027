@@ -67,7 +67,6 @@ struct PigView: View {
         VStack {
             
             if startingPage {
-
                 VStack(spacing: 30) {
 
                     Image(systemName: "dice.fill")
@@ -105,6 +104,7 @@ struct PigView: View {
                     .bold()
 
                     Button("Start Game") {
+                        startNewGame()
                         startingPage = false
                     }
                     .buttonStyle(.borderedProminent)
@@ -281,7 +281,8 @@ struct PigView: View {
                     .tint(turnColor)
 
                     Button("New Game") {
-                        startingPage = true 
+                        startingPage = true
+                        
                     }
                     if gameIsOver {
                         VStack (spacing: 20) {
