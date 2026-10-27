@@ -281,7 +281,7 @@ struct PigView: View {
                     .tint(turnColor)
 
                     Button("New Game") {
-                        startNewGame()
+                        startingPage = true 
                     }
                     if gameIsOver {
                         VStack (spacing: 20) {
