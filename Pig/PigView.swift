@@ -20,6 +20,7 @@ import SwiftUI
 // TRY: Change these two colours. Try Color.purple, Color.green or Color.pink.
 let playerOneColor: Color = Color.blue
 let playerTwoColor: Color = Color.orange
+let playerThreeColor: Color = Color.red
 // The first player to reach this score wins.
 let winningScore: Int = 100
 // The game itself: what it remembers, what it shows on the screen,
@@ -34,7 +35,7 @@ struct PigView: View {
     // The points each player has banked. Banked points are safe.
     @State var playerOneScore: Int = 0
     @State var playerTwoScore: Int = 0
-
+    @State var playerThreeScore: Int = 0
     // The points collected so far on this turn.
     // They are not safe until the player clicks Hold.
     @State var turnTotal: Int = 0
@@ -53,165 +54,280 @@ struct PigView: View {
     @State var gameIsOver: Bool = false
     
     @State var diceRotation: Double =  0
+    
+    @State var startingPage: Bool = true
+    
+    @State var selectedPlayers = 2
+
 
     // MARK: - Computed properties
 
     var body: some View {
-        VStack(spacing: 12) {
+        
+        VStack {
+            
+            if startingPage {
 
-            // The title at the top of the screen.
-            VStack {
+                VStack(spacing: 30) {
 
-                Image(systemName: "dice.fill")
-                    .font(.system(size: 50))
+                    Image(systemName: "dice.fill")
+                        .font(.system(size: 70))
 
-                Text("Pig")
-                    .font(.system(size: 42,
-                                  weight: .heavy))
+                    Text("Pig")
+                        .font(.system(size: 50, weight: .heavy))
 
-            }
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [.blue, .purple],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
+                    Text("Choose Number of Players")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
 
-            // The scoreboard: one card for each player.
-            HStack(spacing: 16) {
-                VStack {
-                    Text("Player 1")
-                        .font(.headline)
-                    Text("\(playerOneScore)")
-                        .font(.system(size: 48, weight: .bold))
-                        .monospacedDigit()
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    currentPlayer == 1
-                    ? playerOneColor.opacity(0.45)
-                    : playerOneColor.opacity(0.15)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 24))
-                .shadow(
-                    color: .black.opacity(0.1),
-                    radius: 8
-                )
-                
-                VStack {
-                    Text("Player 2")
-                        .font(.headline)
-                    Text("\(playerTwoScore)")
-                        .font(.system(size: 48, weight: .bold))
-                        .monospacedDigit()
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
+                    HStack(spacing: 20) {
 
-                    currentPlayer == 2
-                    ? playerTwoColor.opacity(0.45)
-                    : playerTwoColor.opacity(0.15)
+                        Button {
+                            selectedPlayers = 2
+                        } label: {
+                            Text("2 Players")
+                                .frame(width: 150)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(selectedPlayers == 2 ? .blue : .gray)
 
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 24))
-                .shadow(
-                    color: .black.opacity(0.1),
-                    radius: 8
-                )            }
+                        Button {
+                            selectedPlayers = 3
+                        } label: {
+                            Text("3 Players")
+                                .frame(width: 150)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(selectedPlayers == 3 ? .blue : .gray)
 
-            Spacer()
+                    }
+                    .font(.title2)
+                    .bold()
 
-            // Whose turn is it?
-            Text("Player \(currentPlayer), your turn")
-                .font(.title)
-                .bold()
-                .foregroundStyle(turnColor)
-
-            // The die.
-            // TRY: Change the size of the die from 120 to something bigger or smaller.
-            Image(systemName: dieSymbol)
-                .font(.system(size: 120))
-                .foregroundStyle(turnColor)
-                .rotationEffect(.degrees(diceRotation))
-
-            Text("Turn total: \(turnTotal)")
-                .font(.title2)
-                .bold()
-                .monospacedDigit()
-
-            Text(message)
-                .font(.headline)
-                .foregroundStyle(Color.secondary)
-                .multilineTextAlignment(.center)
-                .frame(minHeight: 44)
-
-            Spacer()
-
-            // The two buttons a player uses on their turn.
-            // The code inside the braces runs when that button is clicked.
-            HStack(spacing: 16) {
-                Button("Roll", systemImage: "hand.raised.fill") {
-                    rollDie()
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(gameIsOver)
-
-                Button("Hold", systemImage: "hand.raised.fill") {
-                    hold()
-                }
-                .buttonStyle(.bordered)
-            }
-            .font(.title2)
-            .bold()
-            .controlSize(.large)
-            .tint(turnColor)
-
-            Button("New Game") {
-                startNewGame()
-            }
-            if gameIsOver {
-                VStack (spacing: 20) {
-                    
-                    Image(systemName: "trophy.fill")
-                        .font(.system(size: 80))
-                        .foregroundStyle(.yellow)
-                    
-                    Text("Player \(currentPlayer) Wins!")
-                        .font(.largeTitle)
-                        .bold()
-                    
-                    Button("Play Again") {
-                        startNewGame()
+                    Button("Start Game") {
+                        startingPage = false
                     }
                     .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .font(.title2)
+
                 }
-                .padding(40)
-                .backgroundStyle(.regularMaterial)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.blue, .purple],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .padding(60)
+                .background(.regularMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 30))
+                .shadow(radius: 10)
+
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                .background(
+                    LinearGradient(
+                        colors: [
+                            Color.purple.opacity(0.15),
+                            Color.blue.opacity(0.15)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+                .frame(minWidth: 480, minHeight: 680)
+
+            
+            } else {
+
+                VStack(spacing: 12) {
+
+                    // The title at the top of the screen.
+                    VStack {
+
+                        Image(systemName: "dice.fill")
+                            .font(.system(size: 50))
+
+                        Text("Pig")
+                            .font(.system(size: 42,
+                                          weight: .heavy))
+
+                    }
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.blue, .purple],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+
+                    // The scoreboard: one card for each player.
+                    HStack(spacing: 16) {
+                        VStack {
+                            Text("Player 1")
+                                .font(.headline)
+                            Text("\(playerOneScore)")
+                                .font(.system(size: 48, weight: .bold))
+                                .monospacedDigit()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            currentPlayer == 1
+                            ? playerOneColor.opacity(0.45)
+                            : playerOneColor.opacity(0.15)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                        .shadow(
+                            color: .black.opacity(0.1),
+                            radius: 8
+                        )
+                        
+                        VStack {
+                            Text("Player 2")
+                                .font(.headline)
+                            Text("\(playerTwoScore)")
+                                .font(.system(size: 48, weight: .bold))
+                                .monospacedDigit()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            
+                            currentPlayer == 2
+                            ? playerTwoColor.opacity(0.45)
+                            : playerTwoColor.opacity(0.15)
+                            
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                        .shadow(
+                            color: .black.opacity(0.1),
+                            radius: 8
+                        )
+                        
+                        
+                        if selectedPlayers == 3 {
+                            
+                            VStack {
+                                Text("Player 3")
+                                    .font(.headline)
+                                
+                                Text("\(playerThreeScore)")
+                                    .font(.system(size: 48, weight: .bold))
+                                    .monospacedDigit()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                currentPlayer == 3
+                                ? Color.red.opacity(0.45)
+                                : Color.red.opacity(0.15)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 24))
+                            .shadow(
+                                color: .black.opacity(0.1),
+                                radius: 8
+                            )
+                        }
+                    }
+
+                    Spacer()
+
+                    // Whose turn is it?
+                    Text("Player \(currentPlayer), your turn")
+                        .font(.title)
+                        .bold()
+                        .foregroundStyle(turnColor)
+
+                    // The die.
+                    // TRY: Change the size of the die from 120 to something bigger or smaller.
+                    Image(systemName: dieSymbol)
+                        .font(.system(size: 120))
+                        .foregroundStyle(turnColor)
+                        .rotationEffect(.degrees(diceRotation))
+
+                    Text("Turn total: \(turnTotal)")
+                        .font(.title2)
+                        .bold()
+                        .monospacedDigit()
+
+                    Text(message)
+                        .font(.headline)
+                        .foregroundStyle(Color.secondary)
+                        .multilineTextAlignment(.center)
+                        .frame(minHeight: 44)
+
+                    Spacer()
+
+                    // The two buttons a player uses on their turn.
+                    // The code inside the braces runs when that button is clicked.
+                    HStack(spacing: 16) {
+                        Button("Roll", systemImage: "hand.raised.fill") {
+                            rollDie()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(gameIsOver)
+
+                        Button("Hold", systemImage: "hand.raised.fill") {
+                            hold()
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .font(.title2)
+                    .bold()
+                    .controlSize(.large)
+                    .tint(turnColor)
+
+                    Button("New Game") {
+                        startNewGame()
+                    }
+                    if gameIsOver {
+                        VStack (spacing: 20) {
+                            
+                            Image(systemName: "trophy.fill")
+                                .font(.system(size: 80))
+                                .foregroundStyle(.yellow)
+                            
+                            Text("Player \(currentPlayer) Wins!")
+                                .font(.largeTitle)
+                                .bold()
+                            
+                            Button("Play Again") {
+                                startNewGame()
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                        .padding(40)
+                        .backgroundStyle(.regularMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 30))
+                    }
+                }
+                .background(
+
+                    LinearGradient(
+
+                        colors: [
+                            Color.purple.opacity(0.15),
+                            Color.blue.opacity(0.15)
+                        ],
+
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+
+                    )
+
+                )
+                .padding(32)
+                .fontDesign(.rounded)
+                // How big the game's window is on the Mac. It can be made taller or wider.
+                .frame(minWidth: 480, minHeight: 680)
+
             }
+            
         }
-        .background(
-
-            LinearGradient(
-
-                colors: [
-                    Color.purple.opacity(0.15),
-                    Color.blue.opacity(0.15)
-                ],
-
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-
-            )
-
-        )
-        .padding(32)
-        .fontDesign(.rounded)
-        // How big the game's window is on the Mac. It can be made taller or wider.
-        .frame(minWidth: 480, minHeight: 680)
+        
     }
 
     // MARK: - Functions
@@ -254,13 +370,20 @@ struct PigView: View {
     func hold() {
         if currentPlayer == 1 {
             playerOneScore += turnTotal
-        } else {
+        }
+        else if currentPlayer == 2 {
             playerTwoScore += turnTotal
         }
-     
+        else {
+            playerThreeScore += turnTotal
+        }
+        
         // Has either player reached the winning score?
-        let someoneHasWon: Bool = playerOneScore >= winningScore || playerTwoScore >= winningScore
-     
+        let someoneHasWon: Bool =
+        playerOneScore >= winningScore ||
+        playerTwoScore >= winningScore ||
+        playerThreeScore >= winningScore
+        
         if someoneHasWon {
             message = "Player \(currentPlayer) wins! Click New Game to play again."
             dieSymbol = "trophy.fill"
@@ -274,7 +397,10 @@ struct PigView: View {
     }
 
     // Passes the turn to the other player.
-    func switchPlayer() {
+func switchPlayer() {
+
+    if selectedPlayers == 2 {
+
         if currentPlayer == 1 {
             currentPlayer = 2
             turnColor = playerTwoColor
@@ -282,12 +408,30 @@ struct PigView: View {
             currentPlayer = 1
             turnColor = playerOneColor
         }
+
+    } else {
+
+        if currentPlayer == 1 {
+            currentPlayer = 2
+            turnColor = playerTwoColor
+        }
+        else if currentPlayer == 2 {
+            currentPlayer = 3
+            turnColor = playerThreeColor
+        }
+        else {
+            currentPlayer = 1
+            turnColor = playerOneColor
+        }
+
     }
+}
 
     // Sets everything back to the way it was at the start.
     func startNewGame() {
         playerOneScore = 0
         playerTwoScore = 0
+        playerThreeScore = 0
         turnTotal = 0
         currentPlayer = 1
         turnColor = playerOneColor
