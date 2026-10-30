@@ -57,7 +57,7 @@ struct PigView: View {
     
     @State var startingPage: Bool = true
     
-    @State var selectedPlayers = 2
+    @State var selectedPlayers: Int = 2
 
 
     // MARK: - Computed properties
@@ -222,8 +222,8 @@ struct PigView: View {
                             .padding()
                             .background(
                                 currentPlayer == 3
-                                ? Color.red.opacity(0.45)
-                                : Color.red.opacity(0.15)
+                                ? playerThreeColor.opacity(0.45)
+                                : playerThreeColor.opacity(0.15)
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 24))
                             .shadow(
