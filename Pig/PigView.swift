@@ -9,15 +9,14 @@
 //  Roll a 1 and you lose your turn total, and your turn is over.
 //  Click Hold to bank your turn total into your score and end your turn.
 //
-//  WHAT IT DOES NOT DO YET
-//  Nobody can win! The scores just keep going up.
-//  In the real game, the first player to reach 100 points wins.
+//  EXTENSION
+//  The player who reaches 100 points first wins.
+//  The new 3 player mode
 //
 
 import SwiftUI
 
 // Each player has their own colour.
-// TRY: Change these two colours. Try Color.purple, Color.green or Color.pink.
 let playerOneColor: Color = Color.blue
 let playerTwoColor: Color = Color.orange
 let playerThreeColor: Color = Color.red
@@ -65,7 +64,7 @@ struct PigView: View {
     var body: some View {
         
         VStack {
-            
+    // My own custom start page
             if startingPage {
                 VStack(spacing: 30) {
 
@@ -242,7 +241,6 @@ struct PigView: View {
                         .foregroundStyle(turnColor)
 
                     // The die.
-                    // TRY: Change the size of the die from 120 to something bigger or smaller.
                     Image(systemName: dieSymbol)
                         .font(.system(size: 120))
                         .foregroundStyle(turnColor)
@@ -323,7 +321,7 @@ struct PigView: View {
                 .padding(32)
                 .fontDesign(.rounded)
                 // How big the game's window is on the Mac. It can be made taller or wider.
-                .frame(minWidth: 480, minHeight: 680)
+                .frame(minWidth: 1000, minHeight: 1000)
 
             }
             
