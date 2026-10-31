@@ -48,7 +48,17 @@ Button("Start Game") {
     startingPage = false
 }
 The value stored in selectedPlayers is then used throughout the rest of the program. For example, Player 3's score card is only displayed when a 3-player game is selected, and the switchPlayer() function uses this value to determine whether turns should alternate between two players or cycle through three players.
-Why these tools: startingPage is a @State var because its value changes while the app is running and SwiftUI must update the interface when it changes. selectedPlayers is also a @State var because the player's choice needs to be remembered and used later in the game. Using an if statement to switch between the menu and game screen keeps the code simple and makes it easy to control the flow of the app.
+Why these tools: startingPage is a @State var because its value changes while the app is running and SwiftUI must update the interface when it changes. selectedPlayers is also a @State var because the player's choice needs to be remembered and used later in the game. Using an if statement to switch between the menu and game screen keeps the code simple and makes it easy to control the flow of the app. 
+
+## Testing Section 
+
+| Test | Chosen Imput |  Should happen  | Did happen |
+| --- | --- | --- | --- |
+| The turn passes with 3 players  |3 Players; each player clicks Hold once| The turn goes to Player 2, then 3, then back to 1 | Yes |
+| Only two players | 2 Players; each player clicks Hold once | The turn alternates between Player 1 and Player 2 only. Player 3 does not appear or get a turn. | Yes |
+| Just short of winning (edge)  | Player 1 rolls nineteen times (95) and holds | Player 1s score becomes 95. The game continues because the winning score of 100 has not been reached | Yes |
+| Winning at exactly 100 (edge) | Player 2 and 3 hold: Player 1 rolls once more (100) and holds | Player 1 wins immediately. The win screen/panel appears and no more turns are played. | Yes |
+| Player 3 wins (edge) | 3 Player; Players 1 and 2 hold; Player 3 rolls 20 times (100) and hold | Player 3 wins immediately. The win screen/panel appears showing Player 3 as the winner and the game stops until a new game is started. | Yes |
 ## Author
 Tom Hz
 
