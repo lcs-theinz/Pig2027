@@ -39,7 +39,7 @@ struct PigView: View {
     // They are not safe until the player clicks Hold.
     @State var turnTotal: Int = 0
 
-    // Whose turn it is: 1 or 2.
+    // Whose turn it is: 1.
     @State var currentPlayer: Int = 1
 
     // The colour of whoever's turn it is.
@@ -51,11 +51,11 @@ struct PigView: View {
     // A message that tells the players what just happened.
     @State var message: String = "Player 1 goes first. Click Roll to start."
     @State var gameIsOver: Bool = false
-    
+    // Wich rotation the dice has at the beginning and after each turn
     @State var diceRotation: Double =  0
-    
+    // So that the start Page as first opens
     @State var startingPage: Bool = true
-    
+    // Wich player is selcted first
     @State var selectedPlayers: Int = 2
 
 
